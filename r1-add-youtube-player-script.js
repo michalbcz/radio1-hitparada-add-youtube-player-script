@@ -191,11 +191,9 @@ if (document.getElementById('playerContent') == undefined) {
 			var player = $("#player").get(0);
 			/* toggle repeat mode of currently playing video */
 			if (videoToBeRepeatedInPlaylistIndex == null) {
-				console.debug("Song repetition is: ", "on");
 				videoToBeRepeatedInPlaylistIndex = player.getPlaylistIndex();
 				jQuery(this).text("STOP REPEATING CURRENT SONG");
 			} else {
-				console.debug("Song repetition is: ", "off");
 				videoToBeRepeatedInPlaylistIndex = null;
 				jQuery(this).text("REPEAT CURRENT SONG");
 				
@@ -231,7 +229,7 @@ if (document.getElementById('playerContent') == undefined) {
 			var i = player.getPlaylistIndex();
 			
 			if (!currentSongIndex) {
-				console.debug("Prehravac se poprve spustil");
+				console.debug("YouTube player started for the first time.");
 			}
 			
 			currentSongIndex = i;
@@ -249,5 +247,5 @@ if (document.getElementById('playerContent') == undefined) {
 		
 	};
 } else {
-	console.debug("Radio1 Hitparada Enhancer se uz nachazi na strance a nebude znovu nacten.");
+	console.debug("Radio1 Hitparada Enhancer is already loaded.");
 }
