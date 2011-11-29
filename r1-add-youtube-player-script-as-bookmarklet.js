@@ -5,7 +5,7 @@
  * tak tento bookmarklet ma na startosti pouze naloadovani scriptu z externiho zdroje. 
  */
 var radioJednaScript = document.createElement("script");
-radioJednaScript.src = "http://michal.bernhard.cz/files/r1-final-script.js";
+radioJednaScript.src = "http://raw.github.com/michalbcz/radio1-hitparada-add-youtube-player-script/master/r1-add-youtube-player-script.js";
 radioJednaScript.type = "text/javascript";
 document.getElementsByTagName("head")[0].appendChild(radioJednaScript);
 void(0); 
