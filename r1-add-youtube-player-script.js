@@ -23,6 +23,7 @@
  *  - repeating pisnicky je takove divne - nejdriv se de na dalsi pisnicku v playlistu a pak az
  *    teprve zpet na tu pisnicku, kterou chceme opakovat
  *  - ODSTRANIT BUG - kdyz je REPEAT na songu tak nelze jit dopredu ani dozadu
+ *  - ovladaci prvky by meli mit ovladani klavesnici
  */
 
 if (document.getElementById('playerContent') == undefined) {
