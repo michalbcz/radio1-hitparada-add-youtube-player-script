@@ -33,7 +33,7 @@ if (document.getElementById('playerContent') != undefined) {
 else {
 	/* inject jquery */
 	var jqueryScript = document.createElement("script");
-	jqueryScript.src = "http://code.jquery.com/jquery-1.6.4.min.js";
+	jqueryScript.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js";
 	jqueryScript.type = "text/javascript";
 	jqueryScript.onload = function() { runMachinery(); };
 	document.getElementsByTagName("head")[0].appendChild(jqueryScript);
