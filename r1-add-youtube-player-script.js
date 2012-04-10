@@ -27,7 +27,10 @@
  *  - prehravani i nove nasazenych pisnicek a retro skladby
  */
 
-if (document.getElementById('playerContent') == undefined) {
+if (document.getElementById('playerContent') != undefined) {
+	console.debug("Radio1 Hitparada Enhancer is already loaded.");
+}
+else {
 	/* inject jquery */
 	var jqueryScript = document.createElement("script");
 	jqueryScript.src = "http://code.jquery.com/jquery-1.6.4.min.js";
@@ -248,6 +251,4 @@ if (document.getElementById('playerContent') == undefined) {
 		}
 		
 	};
-} else {
-	console.debug("Radio1 Hitparada Enhancer is already loaded.");
 }
