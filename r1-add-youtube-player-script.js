@@ -19,7 +19,7 @@
  *  - odkaz na last.fm
  *  - mini info ke kapele primo ve strance
  *  - moznost jednoduse hlasovat (odeslani mailu) s odpocitavanim, do kdy je mozne hlasovat 
- *  - LOADING VIDEO kdyz neni youtube video nacteno
+ *  - vynechavani pisnicek, ktere se nepovede nacist a ktere nelze prehravat v embedded forme
  *  - repeating pisnicky je takove divne - nejdriv se de na dalsi pisnicku v playlistu a pak az
  *    teprve zpet na tu pisnicku, kterou chceme opakovat
  *  - ODSTRANIT BUG - kdyz je REPEAT na songu tak nelze jit dopredu ani dozadu
