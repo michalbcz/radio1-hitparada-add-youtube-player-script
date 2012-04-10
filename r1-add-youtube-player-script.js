@@ -24,6 +24,7 @@
  *    teprve zpet na tu pisnicku, kterou chceme opakovat
  *  - ODSTRANIT BUG - kdyz je REPEAT na songu tak nelze jit dopredu ani dozadu
  *  - ovladaci prvky by meli mit ovladani klavesnici
+ *  - prehravani i nove nasazenych pisnicek a retro skladby
  */
 
 if (document.getElementById('playerContent') == undefined) {
