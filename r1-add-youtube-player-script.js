@@ -8,7 +8,6 @@
  * 
  *  - detekce, ze youtube video opravdu sedi k dane pisnicce a pokud ne tak vyrazeni z playlistu
  *  - oznaceni pisnicek, ktere nemaji zadne youtube video
- *  - moznost kliknutim prehrat konkretni pisnicku
  *  - odkaz na stazeni jako mp3
  *  - odkaz na koupi pisnicky na amazonu / itunes 
  *  - sdilet konkretni video na facebooku/google+/twitteru
@@ -71,13 +70,14 @@ else {
 		
 		 
 		console.debug("extract band and song name from page's topten table ");
-		$("table:nth(12) tr").slice(1).each(function(index, value) {
-				var row = $(this).find("td");
-				var band = row.eq(1).text();        
-				var song = row.eq(2).text();        
-				song = song.substring(0, song.indexOf("album:"));   	/*  */ 
-				console.log("band:", band, "song:", song);
-				songs.push({position: index,band: band, song: song});
+		$("table:nth(12) tr").slice(1).each( function(index, value) {
+				var row = $(this).find("td")
+				var band = row.eq(1).text()        
+				var song = row.eq(2).text()        
+				song = song.substring(0, song.indexOf("album:"))
+				console.log("band:", band, "song:", song)
+				var songMetadata = { position: index, band: band, song: song }
+				songs.push(songMetadata)
 		});
 			
 		console.debug("Parsed songs are:", songs);
@@ -135,7 +135,7 @@ else {
 					minFlashVersion, null, null, params, atts);
 	};
 
-
+	/* this function is called by YouTube Player - it's just convention. See more at https://developers.google.com/youtube/js_api_reference */
 	function onYouTubePlayerReady(playerId) {
 		console.debug("Youtube player is ready..");
 		
@@ -151,6 +151,24 @@ else {
 			
 		var videosId = extract(videos, "videoId");
 		console.debug("Extracted just videos ids: ", videosId);
+		
+		/* add play button next each song to let user easily play just some song */
+		console.debug("Adding play buttons to each song..")
+		videosId.forEach(function(value, index) {
+			var $songTableRows = $("table:nth(12) tr")
+			var $songRow = $songTableRows.eq(index + 1) // +1 as first (index 0) row is table header 
+			var $songName = $songRow.find("td").eq(1) 
+			var songPlayButtonHtmlSnippet =
+								'<span id="playVideo' + (index + 1) + '" style="cursor: pointer; margin-right: 5px;" alt="play">' +
+								    '<img width="15" height="15" src="http://www.clker.com/cliparts/7/x/D/A/T/W/blue-play-button-md.png"/>' + 
+								'</span>';
+			$playVideoButton = $songName.prepend(songPlayButtonHtmlSnippet)
+			console.debug($playVideoButton)
+			$playVideoButton.click(function() {
+				var player = $("#player").get(0)
+				player.playVideoAt(index) 
+			})
+		})
 		
 		console.debug("Setting playlist and start to play videos...");
 		player.loadPlaylist(videosId);
