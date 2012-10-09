@@ -184,7 +184,12 @@ else {
 				if(playing && thisSongIsSameAsPlayingSong) {
 					youtubePlayer.pauseVideo();	
 					$playButton.toggleClass("playing", false); 				
-				} else {
+				} 
+				else if(thisSongIsSameAsPlayingSong) {
+					youtubePlayer.playVideo();	
+					$playButton.toggleClass("playing", true);
+				}				
+				else {
 					youtubePlayer.playVideoAt(index);					
 					$playButton.toggleClass("playing", true);
 				}
