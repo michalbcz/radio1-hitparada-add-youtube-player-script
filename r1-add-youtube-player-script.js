@@ -41,7 +41,10 @@ else {
 	var style = document.createElement("style");
 	style.type = "text/css";
 	document.getElementsByTagName("head")[0].appendChild(style);
-	style.innerHTML = ".playing { background-color:yellow; }"
+	style.innerHTML = 
+				"tr.playing { background-color:yellow; }" +
+				"table tr.playing td { background-color:yellow !important; }" +
+				".playButton { padding-left: 10px; }";	
 
 	/* global variables */
 
@@ -50,13 +53,15 @@ else {
 	var currentSongIndex = null;
 	var videoToBeRepeatedInPlaylistIndex = null;
 	var areVideosShuffled = false;
+	
+	var $songRows = $('table.chartPage:eq(0) tr:has(".interpret")');
 
 	function runMachinery() {
 		
 		console.debug("Starting machinery..");
 		
 		console.debug("add html structure on the page");
-		$("table:nth(12)").after('<div id="playerContent" style=".class { display: inline; margin-right:20px; }"></div>');
+		$('table.chartPage:eq(0)').after('<div id="playerContent" style=".class { display: inline; margin-right:20px; }"></div>');
 		$("#playerContent").append('<div id="ytapiplayer">You need Flash player 8+ and JavaScript enabled to view this video.</div>');
 		
 		console.debug("inject swfobject to page");
@@ -70,11 +75,10 @@ else {
 		
 		 
 		console.debug("extract band and song name from page's topten table ");
-		$("table:nth(12) tr").slice(1).each( function(index, value) {
-				var row = $(this).find("td")
-				var band = row.eq(1).text()        
-				var song = row.eq(2).text()        
-				song = song.substring(0, song.indexOf("album:"))
+		$songRows.each( function(index, value) {
+				var $this = $(this)
+				var band = $this.find(".interpret").text();
+				var song = $this.find(".song").eq(0).text();        
 				console.log("band:", band, "song:", song)
 				var songMetadata = { position: index, band: band, song: song }
 				songs.push(songMetadata)
@@ -93,7 +97,8 @@ else {
 			$.ajax({
 			  url: "https://gdata.youtube.com/feeds/api/videos?q="+ band + " " + song + "&alt=json-in-script&v=2&key=AI39si5pjOKyRdCdoBHtkwk78TLvnnBTxb7gD69R4eUeV8EEDtSw0RlUuF8Dq33oe3VcjIh4QbXdBgwssMBD6hknltcrx_VqYA",
 			  context: document.body,
-			  success: function(data){            
+			  success: function(data){           
+				  console.debug("For ", band, " and song ", song, " we obtained this: ", data);
 				  var url = data.feed.entry[0].media$group.media$player.url;
 				  var videoId =  url.substring(url.indexOf("?v") + 3, url.indexOf("&feature"));
 				  var extractedData = {position: position, band: band, song: song, videoId: videoId};
@@ -123,7 +128,7 @@ else {
 	function loadYoutubePlayer() {
 		console.debug("Loading Youtube player on the page...");
 		var params = { allowScriptAccess: "always" };
-		var atts = { id: "player" };
+		var atts = { id: "r1HitparadaPlayer" };
 		var playerWidth = "400";
 		var playerHeight = "279";
 		var replaceElemIdStr = "ytapiplayer";
@@ -142,7 +147,7 @@ else {
 		console.debug("Adding custom player controls...");
 		addPlayerCustomControls();
 		
-		var player = $("#player").get(0);
+		var player = $("#r1HitparadaPlayer").get(0);
 		console.debug("Videos: ", videos);   
 		
 		console.debug("Videos before sort: ", videos);
@@ -155,18 +160,39 @@ else {
 		/* add play button next each song to let user easily play just some song */
 		console.debug("Adding play buttons to each song..")
 		videosId.forEach(function(value, index) {
-			var $songTableRows = $("table:nth(12) tr")
-			var $songRow = $songTableRows.eq(index + 1) // +1 as first (index 0) row is table header 
+			var $songTableRows = $songRows;
+			var $songRow = $songTableRows.eq(index );
 			var $songName = $songRow.find("td").eq(1) 
 			var songPlayButtonHtmlSnippet =
-								'<span id="playVideo' + (index + 1) + '" style="cursor: pointer; margin-right: 5px;" alt="play">' +
-								    '<img width="15" height="15" src="http://www.clker.com/cliparts/7/x/D/A/T/W/blue-play-button-md.png"/>' + 
+								'<span class="ubaControls playButton">' +
+								'   <span id="playVideo' + index + '" class="audioButton">Přehrát</span>' +
 								'</span>';
-			$playVideoButton = $songName.prepend(songPlayButtonHtmlSnippet)
-			console.debug($playVideoButton)
+			$playVideoButton = $songName.prepend(songPlayButtonHtmlSnippet);
+
 			$playVideoButton.click(function() {
-				var player = $("#player").get(0)
-				player.playVideoAt(index) 
+						
+				var $player = $("#r1HitparadaPlayer");
+				var youtubePlayer = $player.get(0);
+				
+				var $playButton = $(this).find(".audioButton");
+				
+				var playing = youtubePlayer.getPlayerState() === 1;
+				var thisSongIsSameAsPlayingSong = youtubePlayer.getPlaylistIndex() == index;
+					
+				$(".playButton .audioButton").toggleClass("playing", false); // removes playing from all buttons 	
+					
+				if(playing && thisSongIsSameAsPlayingSong) {
+					youtubePlayer.pauseVideo();	
+					$playButton.toggleClass("playing", false); 				
+				} else {
+					youtubePlayer.playVideoAt(index);					
+					$playButton.toggleClass("playing", true);
+				}
+				
+				/* prave hrajici pisnicka se v hitparade zvyrazni */
+				$('table.chartPage:eq(0) tr:has(".interpret")').removeClass("playing"); // restartovat tabulku
+				$('table.chartPage:eq(0) tr:has(".interpret")').eq(index).toggleClass("playing"); // nastavit styl
+				
 			})
 		})
 		
@@ -178,16 +204,14 @@ else {
 	};
 	
 	function addPlayerCustomControls() {
-		$("#playerContent").append('<div id="play" class="button">PAUSE</div>');
-		$("#playerContent").append('<div id="previous" class="button">PREVIOUS</div>');
-		$("#playerContent").append('<div id="next" class="button">NEXT</div>');
+		$("#playerContent").append('<div id="play" accesskey="p" class="button">PAUSE</div>');
+		$("#playerContent").append('<div id="previous" accesskey="b" class="button">PREVIOUS</div>');
+		$("#playerContent").append('<div id="next" accesskey="f" class="button">NEXT</div>');
 		$("#playerContent").append('<div id="repeat" class="button">REPEAT CURRENT SONG</div>');
 		$("#playerContent").append('<div id="shuffle" class="button">SHUFFLE</div>');
 		
-		
-		
 		$("#play").click(function() {
-			var player = $("#player").get(0);
+			var player = $("#r1HitparadaPlayer").get(0);
 			var PLAYING = 1;
 			var PAUSED = 2;
 			if (player.getPlayerState() == PLAYING) {
@@ -201,17 +225,17 @@ else {
 		});
 		
 		$("#next").click(function() {
-			var player = $("#player").get(0);
+			var player = $("#r1HitparadaPlayer").get(0);
 			player.nextVideo();
 		});
 		
 		$("#previous").click(function() {
-			var player = $("#player").get(0);
+			var player = $("#r1HitparadaPlayer").get(0);
 			player.previousVideo();
 		});
 		
 		$("#repeat").click(function() {
-			var player = $("#player").get(0);
+			var player = $("#r1HitparadaPlayer").get(0);
 			/* toggle repeat mode of currently playing video */
 			if (videoToBeRepeatedInPlaylistIndex == null) {
 				videoToBeRepeatedInPlaylistIndex = player.getPlaylistIndex();
@@ -226,14 +250,13 @@ else {
 		});
 		
 		$("#shuffle").click(function() {
-			var player = $("#player").get(0);
+			var player = $("#r1HitparadaPlayer").get(0);
 			if (areVideosShuffled) {
 				jQuery(this).text("SHUFFLE");
 				player.setSuffle(false);
 				areVideosShuffled = false;
 			}
 			else {
-				jQuery(this).text("TURN OFF SHUFFLE");
 				player.setSuffle(true);
 				areVideosShuffled = true;
 			}
@@ -244,7 +267,7 @@ else {
 	};
 
 	function onYouTubePlayerStateChange(currentState) {
-		var player = $("#player").get(0);
+		var player = $("#r1HitparadaPlayer").get(0);
 		console.debug("onYouTubePlayerStateChange -> state: ", currentState);
 				
 		if (currentState == 1) { // playing
@@ -264,8 +287,8 @@ else {
 			}
 			
 			/* prave hrajici pisnicka se v hitparade zvyrazni */
-			$("table:nth(12) tr").removeClass("playing"); // restartovat tabulku
-			$("table:nth(12) tr").eq(currentSongIndex+1).toggleClass("playing"); // nastavit styl -> +1 protoze prvni radek v tabulce je nadpis tabulky
+			$('table.chartPage:eq(0) tr:has(".interpret")').removeClass("playing"); // restartovat tabulku
+			$('table.chartPage:eq(0) tr:has(".interpret")').eq(currentSongIndex).toggleClass("playing"); // nastavit styl
 		}
 		
 	};
